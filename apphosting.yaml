@@ -1,4 +1,6 @@
-# Settings for Firebase App Hosting
+# Firebase App Hosting Configuration
+# Documentation: https://firebase.google.com/docs/app-hosting/configure
+
 kind: "AppHostingYaml"
 schemaVersion: "v1"
 
@@ -9,9 +11,32 @@ runConfig:
   cpu: 1
   memoryMiB: 1024
 
+# Environment Variables & Secrets
+#
+# WHY THE BUILD FAILED PREVIOUSLY:
+# In commit 8af4ec4, 'secret: GEMINI_API_KEY' was specified with availability: [BUILD, RUNTIME].
+# App Hosting failed to deploy because the secret did not exist in Secret Manager
+# or the App Hosting backend service account was not granted access.
+#
+# HOW TO CONFIGURE GEMINI_API_KEY:
+#
+# Option A (Recommended - Firebase Console):
+# 1. Open Firebase Console -> App Hosting -> [Your Backend] -> Settings -> Environment
+# 2. Add GEMINI_API_KEY as an environment variable or secret.
+#    Firebase Console manages permissions automatically and overrides apphosting.yaml.
+#
+# Option B (Firebase CLI + Cloud Secret Manager):
+# 1. Create the secret:
+#      firebase apphosting:secrets:set GEMINI_API_KEY
+# 2. Grant backend access:
+#      firebase apphosting:secrets:grantaccess GEMINI_API_KEY
+# 3. Replace 'value: ""' below with:
+#      secret: GEMINI_API_KEY
+#      availability:
+#        - RUNTIME
+
 env:
   - variable: GEMINI_API_KEY
-    secret: GEMINI_API_KEY
+    value: ""
     availability:
       - RUNTIME
-      - BUILD
